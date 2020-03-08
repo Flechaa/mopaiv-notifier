@@ -1,7 +1,5 @@
 const { MessageEmbed, WebhookClient } = require("discord.js");
-const express = require("express");
 require("dotenv").config();
-const app = express();
 let notifier = require("./notify.js");
 notifier = new notifier();
 const mongoose = require("mongoose");
@@ -13,14 +11,6 @@ const notifierweb = new WebhookClient(
 mongoose.connect(process.env.db_uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
-});
-
-app.get("/", function(request, response) {
-  response.sendStatus(200);
-});
-
-const listener = app.listen(process.env.PORT, function() {
-  console.log("Your app is listening on port " + listener.address().port);
 });
 
 notifier.on("newItem", item => {
