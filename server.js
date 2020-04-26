@@ -45,7 +45,7 @@ function notifierembed(item) {
     .setColor(Number(item.Exclusive) ? "BLUE" : "GREEN")
     .setTitle(item.Name)
     .setURL(`https://mopaiv.com/market/item/${item.id}`)
-    .setThumbnail(`https://cdn.mopaiv.com/market/${item.Image}.png`)
+    .setThumbnail(item.Image)
     .setDescription(
       `**Price:** ${Number(
         item.Cost

@@ -1,6 +1,7 @@
 const EventEmitter = require("events");
 const notify = require("./models/notifier");
 const fetch = require("node-fetch");
+const cheerio = require("cheerio");
 
 module.exports = class Notifier extends EventEmitter {
   constructor(...args) {
@@ -8,15 +9,28 @@ module.exports = class Notifier extends EventEmitter {
   }
 
   start() {
-    setInterval(async () => await this.checkNewItems(), 1000 * process.env.delay);
+    setInterval(
+      async () => await this.checkNewItems(),
+      1000 * process.env.delay
+    );
   }
 
   async getItems() {
     try {
-      const body = await fetch(`https://mopaiv.com/api/market/recent`).then(
-        res => res.json()
+      const body = await fetch(`https://mopaiv.com/market/?t=r`).then(res =>
+        res.text()
       );
-      return body;
+      const content = []
+      const $ = cheerio.load(body)
+      $("#TAtPo9ZE div.col-sm-3").each(function() {
+        const id = $(this).find("div a").attr("href").replace(/\D/g, "")
+        const name = $(this).find("a span.font-weight-light").text()
+        const thumbnail = $(this).find("div img.img-fluid").attr("src")
+        const price = Number($(this).find("span.currency").parent().text())
+        const exclusive = $(this).find("div[title='Exclusive Item'] img").attr("src") ? "1" : "0"
+        content.push({id: id, Name: name, Image: thumbnail, Cost: price, Exclusive: exclusive})
+      });
+      return content;
     } catch (err) {
       console.error(err);
     }
